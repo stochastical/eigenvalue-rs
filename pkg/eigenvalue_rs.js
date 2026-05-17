@@ -1,6 +1,5 @@
 export class Circle {
     static __wrap(ptr) {
-        ptr = ptr >>> 0;
         const obj = Object.create(Circle.prototype);
         obj.__wbg_ptr = ptr;
         CircleFinalization.register(obj, obj.__wbg_ptr, obj);
@@ -59,7 +58,6 @@ if (Symbol.dispose) Circle.prototype[Symbol.dispose] = Circle.prototype.free;
 
 export class Complex {
     static __wrap(ptr) {
-        ptr = ptr >>> 0;
         const obj = Object.create(Complex.prototype);
         obj.__wbg_ptr = ptr;
         ComplexFinalization.register(obj, obj.__wbg_ptr, obj);
@@ -87,7 +85,7 @@ export class Complex {
      */
     constructor(re, im) {
         const ret = wasm.complex_new(re, im);
-        this.__wbg_ptr = ret >>> 0;
+        this.__wbg_ptr = ret;
         ComplexFinalization.register(this, this.__wbg_ptr, this);
         return this;
     }
@@ -155,7 +153,7 @@ export class Matrix {
         const ptr0 = passArrayJsValueToWasm0(entries, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
         const ret = wasm.matrix_new(order, ptr0, len0);
-        this.__wbg_ptr = ret >>> 0;
+        this.__wbg_ptr = ret;
         MatrixFinalization.register(this, this.__wbg_ptr, this);
         return this;
     }
@@ -172,11 +170,10 @@ export class Matrix {
     }
 }
 if (Symbol.dispose) Matrix.prototype[Symbol.dispose] = Matrix.prototype.free;
-
 function __wbg_get_imports() {
     const import0 = {
         __proto__: null,
-        __wbg___wbindgen_throw_6ddd609b62940d55: function(arg0, arg1) {
+        __wbg___wbindgen_throw_9c31b086c2b26051: function(arg0, arg1) {
             throw new Error(getStringFromWasm0(arg0, arg1));
         },
         __wbg_circle_new: function(arg0) {
@@ -203,19 +200,19 @@ function __wbg_get_imports() {
     };
     return {
         __proto__: null,
-        "./gershgorin_circle_theorem_bg.js": import0,
+        "./eigenvalue_rs_bg.js": import0,
     };
 }
 
 const CircleFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_circle_free(ptr >>> 0, 1));
+    : new FinalizationRegistry(ptr => wasm.__wbg_circle_free(ptr, 1));
 const ComplexFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_complex_free(ptr >>> 0, 1));
+    : new FinalizationRegistry(ptr => wasm.__wbg_complex_free(ptr, 1));
 const MatrixFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry(ptr => wasm.__wbg_matrix_free(ptr >>> 0, 1));
+    : new FinalizationRegistry(ptr => wasm.__wbg_matrix_free(ptr, 1));
 
 function addToExternrefTable0(obj) {
     const idx = wasm.__externref_table_alloc();
@@ -249,8 +246,7 @@ function getDataViewMemory0() {
 }
 
 function getStringFromWasm0(ptr, len) {
-    ptr = ptr >>> 0;
-    return decodeText(ptr, len);
+    return decodeText(ptr >>> 0, len);
 }
 
 let cachedUint8ArrayMemory0 = null;
@@ -287,8 +283,9 @@ function decodeText(ptr, len) {
 
 let WASM_VECTOR_LEN = 0;
 
-let wasmModule, wasm;
+let wasmModule, wasmInstance, wasm;
 function __wbg_finalize_init(instance, module) {
+    wasmInstance = instance;
     wasm = instance.exports;
     wasmModule = module;
     cachedDataViewMemory0 = null;
@@ -365,7 +362,7 @@ async function __wbg_init(module_or_path) {
     }
 
     if (module_or_path === undefined) {
-        module_or_path = new URL('gershgorin_circle_theorem_bg.wasm', import.meta.url);
+        module_or_path = new URL('eigenvalue_rs_bg.wasm', import.meta.url);
     }
     const imports = __wbg_get_imports();
 
