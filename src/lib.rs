@@ -93,6 +93,63 @@ impl std::ops::Div for Complex {
         }
     }
 }
+
+impl std::ops::Add<f64> for Complex {
+    type Output = Complex;
+    fn add(self, other: f64) -> Complex {
+        Complex { re: self.re + other, im: self.im }
+    }
+}
+
+impl std::ops::Add<Complex> for f64 {
+    type Output = Complex;
+    fn add(self, other: Complex) -> Complex {
+        Complex { re: self + other.re, im: other.im }
+    }
+}
+
+impl std::ops::Sub<f64> for Complex {
+    type Output = Complex;
+    fn sub(self, other: f64) -> Complex {
+        Complex { re: self.re - other, im: self.im }
+    }
+}
+
+impl std::ops::Sub<Complex> for f64 {
+    type Output = Complex;
+    fn sub(self, other: Complex) -> Complex {
+        Complex { re: self - other.re, im: -other.im }
+    }
+}
+
+impl std::ops::Mul<f64> for Complex {
+    type Output = Complex;
+    fn mul(self, other: f64) -> Complex {
+        Self { re: self.re * other, im: self.im * other }
+    }
+}
+
+impl std::ops::Mul<Complex> for f64 {
+    type Output = Complex;
+    fn mul(self, other: Complex) -> Complex {
+        Complex { re: other.re * self, im: other.im * self }
+    }
+}
+
+impl std::ops::Div<f64> for Complex {
+    type Output = Complex;
+    fn div(self, other: f64) -> Complex {
+       Complex { re: self.re / other, im: self.im / other }
+    }
+}
+
+impl std::ops::Div<Complex> for f64 {
+    type Output = Complex;
+    fn div(self, other: Complex) -> Complex {
+        Complex::real(self) / other
+    }
+}
+
 //:complex-ops
 
 //:circle-struct
@@ -129,12 +186,12 @@ fn householder_reflector(x: Vec<Complex>) -> Option<Vec<Complex>> {
 
     let mut z = x.clone();
     let rho = z[0].re.signum();
-    z[0] = z[0] + Complex::real(rho * norm(&z));
+    z[0] = z[0] + rho * norm(&z);
     let norm_z = norm(&z);
 
     // Normalise z
     for elem in &mut z {
-        *elem = *elem / Complex::real(norm_z);
+        *elem = *elem / norm_z;
     }
     Some(z)
 }
@@ -229,7 +286,6 @@ impl Matrix {
     }
     //:gershgorin_circles
 
-
     /// Uses the Gram-Schmidt process to perform QR decomposition
     //:qr-decomposition
     fn qr_decomposition(&self) -> (Matrix, Matrix) {
@@ -297,7 +353,7 @@ impl Matrix {
                 // Update column j in-place: A[:,j] = A[:,j] - 2 * (u† * A[:,j]) * u
                 for idx in 0..m {
                     h.set(k + 1 + idx, j,
-                        h.get(k + 1 + idx, j) - Complex::real(2.0) * dot * u_k[idx]
+                        h.get(k + 1 + idx, j) - 2.0 * dot * u_k[idx]
                     );
                 }
             }
@@ -313,7 +369,7 @@ impl Matrix {
                 // Update row i in-place: A[i,:] = A[i,:] - 2 * (A[i,:] * u) * u†
                 for idx in 0..m {
                     h.set(i, k + 1 + idx,
-                        h.get(i, k + 1 + idx) - Complex::real(2.0) * dot * u_k[idx].conj()
+                        h.get(i, k + 1 + idx) - 2.0 * dot * u_k[idx].conj()
                     );
                 }
             }
@@ -369,11 +425,11 @@ impl Matrix {
                 );
                 let trace = a + d;
                 let det = a * d - b * c;
-                let discriminant = (trace * trace) / Complex::real(4.0) - det;
+                let discriminant = (trace * trace) / 4.0 - det;
 
                 (
-                    trace / Complex::real(2.0) + discriminant.sqrt(),
-                    trace / Complex::real(2.0) - discriminant.sqrt()
+                    trace / 2.0 + discriminant.sqrt(),
+                    trace / 2.0 - discriminant.sqrt()
                 )
             };
 
